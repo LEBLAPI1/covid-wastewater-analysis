@@ -22,6 +22,8 @@ data_collector.store_data(api_data)
 
 # you might need to update the local host below for your machine:  app.run(host='192.168.0.60', port=5000, debug=True)
 
+# testing another change / commit here for CI / CD pipeline on GitHub
+
 
 @app.route('/')
 def index():
