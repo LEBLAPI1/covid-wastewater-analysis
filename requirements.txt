@@ -2,3 +2,4 @@ Flask
 Pandas
 Plotly
 sqlalchemy
+requests
