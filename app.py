@@ -20,6 +20,7 @@ api_data = data_collector.fetch_data_from_api()
 data_collector.store_data(api_data)
 
 
+# you might need to update the local host below for your machine:  app.run(host='192.168.0.60', port=5000, debug=True)
 
 
 @app.route('/')
