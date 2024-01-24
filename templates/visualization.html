@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visualization</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Data Visualization</h1>
+    <form id="dataForm">
+        <label for="state">Select State:</label>
+        <select id="state" name="state">
+            <!-- Options will be added dynamically by JavaScript -->
+        </select>
+
+
+        <button type="button" onclick="updateGraph()">Update Graph</button>
+    </form>
+
+    <div id="plot"></div>
+    
+    <h2>:</h2>
+    <pre id="debug"></pre>
+
+    
+    <div id="data-table">
+        <!-- The updated table from Flask will be inserted here -->
+    </div>
+
+    <script>
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            populateDropdowns();  // Populate dropdown when the page loads
+            // loadData();  // Uncomment to load initial table data when the page loads
+        });
+    
+        //function updateGraph() {
+        //    var state = document.getElementById('state').value;
+        //    console.log("Selected State:", state);  // This will print the selected state to the console
+        
+            // Call Flask endpoint to get filtered data by state
+       //     fetch(`/visualization?state=${state}`)
+       //         .then(response => response.text())  // Expecting text/html response, not JSON
+       //         .then(html => {
+       //             document.getElementById('data-table').innerHTML = html;
+       //         })
+       //        .catch(error => console.error('Error:', error));
+       // }
+       
+        function updateGraph() {
+            var state = document.getElementById('state').value;
+            console.log("Selected State:", state);  // This will print the selected state to the console
+    
+            fetch(`/visualization?state=${state}`)
+                .then(response => response.json())  // Expecting JSON response, not text
+                .then(data => {
+                    // Assuming 'graphJSON' is the key in the JSON response
+                    
+                    
+                    //document.getElementById('debug').textContent = JSON.stringify(data, null, 2);
+                    
+                    var graphData = JSON.parse(data.graphJSON);
+                    Plotly.newPlot('plot', graphData.data, graphData.layout);
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+        
+
+
+        function loadData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    // Assuming data is an array of objects
+                    let first100Records = data.slice(0, 100);
+                    displayData(first100Records);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    
+        function displayData(data) {
+            let table = '<table>';
+            // Add headers
+            table += '<tr>';
+            for (let key in data[0]) {
+                table += `<th>${key}</th>`;
+            }
+            table += '</tr>';
+        
+            // Add data rows
+            data.forEach(record => {
+                table += '<tr>';
+                for (let key in record) {
+                    table += `<td>${record[key]}</td>`;
+                }
+                table += '</tr>';
+            });
+            table += '</table>';
+        
+            document.getElementById('data-table').innerHTML = table;
+        }
+
+    
+        // loadData();  // Call this function to load and display data when the page loads
+        
+        function populateDropdowns() {
+            fetch('/dropdown-data')
+                .then(response => response.json())
+                .then(data => {
+                    let stateSelect = document.getElementById('state');
+        
+                    // Clear existing options
+                    stateSelect.innerHTML = '';
+        
+                    // Assuming 'states' is an array of state names
+                    let uniqueStates = [...new Set(data.states)]; // Remove duplicates
+        
+                    uniqueStates.forEach(state => {
+                        let option = document.createElement('option');
+                        option.value = state;
+                        option.text = state;  // The full state name is set as the text
+                        stateSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+}
+        
+        populateDropdowns();  // Call this when the page loads
+
+
+
+    </script>
+</body>
+</html>
+
