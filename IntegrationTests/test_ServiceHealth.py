@@ -17,7 +17,8 @@ from Messenger import Messenger
 class TestServiceHealth(unittest.TestCase):
     
     def test_service_health(self):
-        url = "http://192.168.0.60:5000/"
+        #url = "http://192.168.0.60:5000/"
+        url = "http://0.0.0.0:5000/"
         messenger = Messenger(url)
         service_ok, message = messenger.check_service()
         self.assertTrue(service_ok, f"Service health check failed: {message}")

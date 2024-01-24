@@ -79,7 +79,9 @@ if __name__ == '__main__':
     unittest.TextTestRunner().run(unittest.TestLoader().discover('UnitTests'))
        
     print("Starting Flask app")
-    app.run(host='192.168.0.60', port=5000, debug=True)
+    #app.run(host='192.168.0.60', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    
     
 
 
