@@ -25,5 +25,6 @@ class Messenger:
 # Usage
 #messenger = Messenger("http://192.168.0.60:5000/")
 messenger = Messenger("http://0.0.0.0:5000/")
+#messenger = Messenger("http://localhost:5000/")
 is_ok, message = messenger.check_service()
 print(message)

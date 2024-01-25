@@ -14,15 +14,57 @@ import plotly
 
 import warnings
 
+import logging
+
+
+
 class DataAnalyzer:
     def __init__(self, df, state='Illinois'):
         self.df = df
         self.state = state
+        
+        self.logger = logging.getLogger(__name__)
+        
+        self.county = ""
 
     def filter_and_prepare_data(self):
         # Filter DataFrame based on state
-        filtered_df = self.df[self.df['wwtp_jurisdiction'] == self.state]
+        
+        #print("\n\n\n")
+        #print("DataAnalyzer ... df info:")
+        #print(self.df.columns)
+        #print(self.df)
+        #print(len(self.df))
+        
+        filtered_df = self.df[self.df['wwtp_jurisdiction'] == self.state].copy()
+        
+        #print("\n\n\n")
+        #print("DataAnalyzer ... df info:")
+        #print(filtered_df.columns)
+        #print(filtered_df)
+        #print(len(filtered_df))
+        
+        var_new_df = filtered_df.copy()
+        
+        var_new_df = var_new_df.groupby('county_names').first().reset_index()
+        
+        first_row_country_name = var_new_df.iloc[0]['county_names']
+        
+        self.county = first_row_country_name
+        
+        #self.logger.info("first_row_country_name = ")
+        #self.logger.info(first_row_country_name)
+        
+        # pick first county here as some states have multiple counties:
+        filtered_df = filtered_df[filtered_df["county_names"] == first_row_country_name]
+        
         filtered_df_subset = filtered_df[['date_start', 'ptc_15d']]
+        
+        #print("\n\n\n")
+        #print("DataAnalyzer ... df info:")
+        #print(filtered_df_subset.columns)
+        #print(filtered_df_subset)
+        #print(len(filtered_df_subset))
 
         # Convert 'ptc_15d' to numeric and filter
         #filtered_df_subset['ptc_15d'] = pd.to_numeric(filtered_df_subset['ptc_15d'], errors='coerce')

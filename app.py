@@ -33,7 +33,6 @@ def index():
 
 @app.route('/data')
 def get_data():
-    # Removed app.app_context() as it is not necessary here
     data = data_collector.ApiData.query.limit(100).all()  # Get the first 100 records
     data_dicts = [item.__dict__ for item in data]
     for record in data_dicts:
@@ -59,17 +58,29 @@ def show_visualization():
 def visualize_data():
     state = request.args.get('state', "Illinois")  # Default to Illinois if not specified
 
-    # Removed app.app_context() here as well
-    data = data_collector.ApiData.query.filter_by(wwtp_jurisdiction=state).all()
-    df = pd.DataFrame([item.__dict__ for item in data])
+    #data = data_collector.ApiData.query.filter_by(wwtp_jurisdiction=state).all()
+    #df = pd.DataFrame([item.__dict__ for item in data])
+    
+    df = data_collector.df_data.copy()
+    #app.logger.info(f"DataFrame columns: {df.columns}")
+    #app.logger.info(f"DataFrame columns: {df}")
+    df = df[df["wwtp_jurisdiction"]==state]
+    
+    #print("from app.py df output here:")
+    #print(df.columns)
+    #app.logger.info(f"DataFrame columns: {df.columns}")
+    #app.logger.info(f"DataFrame columns: {df}")
 
     # Create an instance of DataAnalyzer
     data_analyzer = DataAnalyzer(df, state)
 
     # Generate visualization
     graphJSON = data_analyzer.generate_visualization()
+    
+    var_county_name = data_analyzer.county
 
-    return jsonify({'graphJSON': graphJSON})
+    #return jsonify({'graphJSON': graphJSON})
+    return jsonify({'graphJSON': graphJSON, 'countyName': var_county_name})
 
 
 if __name__ == '__main__':
@@ -81,6 +92,7 @@ if __name__ == '__main__':
     print("Starting Flask app")
     #app.run(host='192.168.0.60', port=5000, debug=True)
     app.run(host='0.0.0.0', port=5000, debug=True)
+    #app.run(host='localhost', port=5000, debug=True)
     
     
 

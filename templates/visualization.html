@@ -18,7 +18,9 @@
 
     <div id="plot"></div>
     
-    <h2>:</h2>
+    <p id="countyName"></p>
+    
+    <h2> </h2>
     <pre id="debug"></pre>
 
     
@@ -53,13 +55,16 @@
             fetch(`/visualization?state=${state}`)
                 .then(response => response.json())  // Expecting JSON response, not text
                 .then(data => {
-                    // Assuming 'graphJSON' is the key in the JSON response
-                    
-                    
-                    //document.getElementById('debug').textContent = JSON.stringify(data, null, 2);
-                    
+                    // Extracting graph data and county name from the response
                     var graphData = JSON.parse(data.graphJSON);
+                    var countyName = data.countyName;
+        
+                    // Update the plot with new data
                     Plotly.newPlot('plot', graphData.data, graphData.layout);
+        
+                    // Update the webpage to display the county name
+                    // Assuming you have an element with id 'countyName' to display this information
+                    document.getElementById('countyName').textContent = `County: ${countyName}`;
                 })
                 .catch(error => console.error('Error:', error));
             }

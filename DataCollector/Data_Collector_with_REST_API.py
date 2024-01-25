@@ -57,6 +57,7 @@ class DataCollector:
         self.db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=self.engine))
         self.Base = declarative_base()
         self.Base.query = self.db_session.query_property()
+        self.df_data = None
         
         class ApiData(self.Base):
             __tablename__ = 'api_data'
@@ -100,7 +101,34 @@ class DataCollector:
 
 
     def fetch_data_from_api(self):
-        response = requests.get("https://data.cdc.gov/resource/2ew6-ywp6.json")
+        #response = requests.get("https://data.cdc.gov/resource/2ew6-ywp6.json")
+        
+        # limit this demo to 30000 records
+        limit = 30000  # You can change this number based on your needs
+
+        # Modify the URL to include the limit parameter
+        response = requests.get(f"https://data.cdc.gov/resource/2ew6-ywp6.json?$limit={limit}")
+
+        # code to get all data here:
+        '''
+        limit = 100000  # The maximum number of records per request
+        offset = 0
+        all_data = []
+
+        while True:
+            response = requests.get(f"https://data.cdc.gov/resource/2ew6-ywp6.json?$limit={limit}&$offset={offset}")
+            if response.status_code != 200:
+                raise Exception(f"API request failed ..... response code = {response.status_code}")
+
+            data = response.json()
+            if not data:  # Break the loop if no more data is returned
+                break
+
+            all_data.extend(data)
+            offset += limit
+        '''
+            
+        
         if response.status_code == 200:
             data = response.json()
     
@@ -111,8 +139,14 @@ class DataCollector:
             # Convert to DataFrame and save to CSV file for debugging
             df = pd.DataFrame(data)
             df.to_csv('data.csv', index=False)
+            
+            #print(" fetch data columns here...")
+            #print(df.columns)
+            
+            self.df_data = df
     
-            return data            
+            return data
+            #return df               
 
         else:
             raise Exception(f"API request failed ..... response code = {response.status_code}")
